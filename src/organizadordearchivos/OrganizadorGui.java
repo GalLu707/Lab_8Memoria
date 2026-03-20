@@ -152,6 +152,10 @@ public class OrganizadorGui extends JFrame {
         JButton btnOrganizar = new JButton("Organizar");
         JButton btnNuevaCarpeta = new JButton("Nueva Carpeta");
         JButton btnRenombrar = new JButton("Renombrar");
+        JButton btnCopiar = new JButton("Copiar");
+        JButton btnPegar = new JButton("Pegar");
+        
+        
 
         btnOrganizar.addActionListener(e -> ejecutarOrganizacion());
 
@@ -174,7 +178,9 @@ public class OrganizadorGui extends JFrame {
         toolBar.add(btnOrganizar);
         toolBar.add(btnNuevaCarpeta);
         toolBar.add(btnRenombrar);
-        
+        toolBar.add(btnCopiar);
+         toolBar.add(btnPegar);
+          
 
         return toolBar;
          
