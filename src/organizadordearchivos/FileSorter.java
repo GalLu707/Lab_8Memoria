@@ -4,9 +4,9 @@ import java.io.File;
 import java.util.Comparator;
 
 public class FileSorter {
-
+    
     public static ListaEnlazada bubbleSort(ListaEnlazada list, Comparator<File> comparator) {
-
+        
         ListaEnlazada sorted = copyList(list);
         
         if (sorted.size() <= 1) return sorted;
@@ -16,7 +16,7 @@ public class FileSorter {
         do {
             swapped = false;
             FileNode current = sorted.getHead();
-
+            
             while (current != null && current.next != null) {
                 if (comparator.compare(current.data, current.next.data) > 0) {
 
@@ -32,17 +32,19 @@ public class FileSorter {
         return sorted;
     }
 
-    public static ListaEnlazada mergeSort(ListaEnlazada list,
-                                           Comparator<File> comparator) {
+    public static ListaEnlazada mergeSort(ListaEnlazada list, Comparator<File> comparator) {
         ListaEnlazada copy = copyList(list);
-        ListaEnlazada sortedHead = mergeSortNode(copy.getHead(), comparator);
-
+        
+        FileNode sortedHead = mergeSortNode(copy.getHead(), comparator);
+        
         ListaEnlazada result = new ListaEnlazada();
         FileNode current = sortedHead;
+        
         while (current != null) {
             result.addNode(new FileNode(current.data));
             current = current.next;
         }
+        
         return result;
     }
 
