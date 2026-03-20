@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -74,12 +76,20 @@ public class OrganizadorGui extends JFrame {
     
     
      private void initComponents(){
+         setupContentTable();
+         
          
          JPanel northPanel = new JPanel(new BorderLayout());
          northPanel.setBackground(Color_Panel);
          
          JToolBar toolBar = createToolBar();
          northPanel.add(toolBar, BorderLayout.NORTH);
+
+         JScrollPane treeScroll = new JScrollPane(fileTree);
+         JScrollPane tableScroll = new JScrollPane(fileTable);
+         tableScroll.getViewport().setBackground(Color_Fondo);
+        
+
          
          pathLabel = new JLabel(" Carpeta actual: " + raizPath);
         pathLabel.setForeground(Color_Texto);
@@ -93,15 +103,26 @@ public class OrganizadorGui extends JFrame {
         
         // Estilizar Árbol
         fileTree.setBackground(Color_Fondo);
-        fileTree.setForeground(Color_Texto);
+         fileTree.setForeground(Color_Texto);
 
-         fileTree.addTreeSelectionListener(e ->{
+         fileTree.addTreeSelectionListener(e -> {
              DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) fileTree.getLastSelectedPathComponent();
-            if (selectedNode != null) {
-               
-                pathLabel.setText(" Ruta: " + selectedNode.toString());
-            }   
-             
+             if (selectedNode != null) {
+
+                 StringBuilder fullPath = new StringBuilder(raizPath);
+                 Object[] paths = selectedNode.getUserObjectPath();
+
+                 for (int i = 1; i < paths.length; i++) {
+                     fullPath.append(File.separator).append(paths[i]);
+                 }
+
+                 currentDirPath = fullPath.toString();
+                 pathLabel.setText(" Ruta: " + currentDirPath);
+                 actualizarTabla(new File(currentDirPath));
+
+                 // pathLabel.setText(" Ruta: " + selectedNode.toString());
+             }
+
          });
           JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, 
                 new JScrollPane(fileTree), new JScrollPane(new JList())); // JList temporal
@@ -191,13 +212,57 @@ public class OrganizadorGui extends JFrame {
      }
      
      private void setupContentTable(){
-     
-     
+         
+         String[] columnNames= {"Nombre", "Tamaño", "Tipo", "Fecha Modificacion"};
+         tableModel= new DefaultTableModel(columnNames, 0){
+             @Override
+             public boolean isCellEditable(int row, int columna){
+                return false; 
+             }
+         };
+         
+         fileTable = new JTable(tableModel);
+         fileTable.setBackground(Color_Fondo);
+         fileTable.setForeground(Color_Texto);
+         fileTable.setSelectionBackground(Color_Azul);
+         fileTable.setGridColor(Color_Panel);
+         fileTable.setRowHeight(25);
+
      
      }
      
+     private void actualizarTabla(File carpeta){
+         tableModel.setRowCount(0);
+         File[] archivos = carpeta.listFiles();
+         
+         
+         if(archivos != null ){
+             SimpleDateFormat adf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+             
+             for(File f : archivos){
+                 String nombre = f.getName();
+                 String tamaño = f.isDirectory() ? "--": (f.length()/1024)+ " KB";
+                 
+            String tipo = f.isDirectory() ? "Carpeta" : getExtension(nombre).toUpperCase();
+            String fecha = adf.format(new Date(f.lastModified()));
+
+            Object[] fila = {nombre, tamaño, tipo, fecha};
+            tableModel.addRow(fila);
+                 
+             }
+             
+         }
+         
+         
+     }
      
-     
+     private String getExtension(String fileName) {
+    int i = fileName.lastIndexOf('.');
+    if (i > 0 && i < fileName.length() - 1) {
+        return fileName.substring(i + 1).toLowerCase();
+    }
+    return "Archivo"; 
+}
      
      
 }
